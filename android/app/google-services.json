@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "701480206423",
+    "project_id": "chatsta-eff57",
+    "storage_bucket": "chatsta-eff57.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:701480206423:android:4f5f77f49355383e8ba312",
+        "android_client_info": {
+          "package_name": "com.chatsta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "701480206423-u7315ab5s2hled2uthkmcibo32fe18ng.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyyNR07VdZvTA4CcnqIJNFix_PY6t33vk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "701480206423-u7315ab5s2hled2uthkmcibo32fe18ng.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
