@@ -12,7 +12,7 @@ import {setAddImage} from '../../redux/Slices/UserSlice';
 const AddPhotosScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const {data} = useSelector(state => state.user);
+  const data = useSelector(state => state.user.data);
   console.log(data, 'data');
   const [imageArray, setImageArray] = useState([]);
 
@@ -113,7 +113,7 @@ const AddPhotosScreen = () => {
     try {
       uploadImagesToStorage(imageArray)
         .then(async uploadedImageUrls => {
-          console.log(uploadedImageUrls,"uploadedImageUrls");
+          console.log(uploadedImageUrls, 'uploadedImageUrls');
           dispatch(setAddImage(uploadedImageUrls));
           navigation.navigate('Moreaboutyou');
         })

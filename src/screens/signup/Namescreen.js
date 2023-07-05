@@ -10,7 +10,7 @@ import {setUserName} from '../../redux/Slices/UserSlice';
 const Namescreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {data} = useSelector(state => state.user);
+  const data = useSelector(state => state.user.data);
   console.log(data, 'data');
 
   const [FName, setFName] = useState('');

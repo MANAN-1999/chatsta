@@ -20,13 +20,15 @@ import Moreaboutyou from '../screens/signup/Moreaboutyou';
 import AlmostDone from '../screens/signup/AlmostDone';
 import Yahoo from '../screens/signup/Yahoo';
 import TabNavtigation from './TabNavtigation';
+import Accounts from '../screens/settings/Accounts';
+import ChatScreen from '../screens/messages/ChatScreen';
 const Stack = createNativeStackNavigator();
 const HomeStack = () => {
   return (
     <Stack.Navigator
       initialRouteName="Splash"
       screenOptions={{headerShown: false}}>
-      {/* <Stack.Screen name="Splash" component={Splash} />
+      <Stack.Screen name="Splash" component={Splash} />
       <Stack.Screen name="OnBording" component={OnBording} />
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="Login" component={Login} />
@@ -42,8 +44,10 @@ const HomeStack = () => {
       <Stack.Screen name="AddPhotosScreen" component={AddPhotosScreen} />
       <Stack.Screen name="Moreaboutyou" component={Moreaboutyou} />
       <Stack.Screen name="AlmostDone" component={AlmostDone} />
-      <Stack.Screen name="Yahoo" component={Yahoo} /> */}
+      <Stack.Screen name="Yahoo" component={Yahoo} />
       <Stack.Screen name="TabNavtigation" component={TabNavtigation} />
+      <Stack.Screen name='Accounts' component={Accounts}/>
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
     </Stack.Navigator>
   );
 };

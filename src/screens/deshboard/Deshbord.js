@@ -5,27 +5,115 @@ import {
   View,
   TouchableOpacity,
   TextInput,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {emojis} from '../../assets/data/dummydata';
-import PostCard from "../../component/PostCard";
+import PostCard from '../../component/PostCard';
+import {useSelector} from 'react-redux';
+import firestore from '@react-native-firebase/firestore';
 
 const Deshbord = () => {
   const [showSearchInput, setShowSearchInput] = useState(true);
   const [searchText, setSearchText] = useState('');
+  const [userData, setUserData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const msgRef = firestore().collectionGroup('allposts');
+
+      msgRef.onSnapshot(querysnap => {
+        const allMsg = querysnap.docs.map(docsnap => {
+          return {
+            ...docsnap.data(),
+          };
+        });
+
+        const sortedPosts = allMsg.sort((a, b) => b.createdAt - a.createdAt); // Sort the posts based on createdAt in descending order
+        console.log(sortedPosts, 'sortedPosts');
+        setUserData(sortedPosts);
+
+
+        console.log(allMsg, 'allMsg');
+        setUserData(allMsg);
+        // setMessages(allMsg);
+       
+      });
+      const shuffledPosts = shuffleArray(allMsg); // Shuffle the posts array
+      console.log(shuffledPosts, 'shuffledPosts');
+      setUserData(shuffledPosts);
+
+      // postsRef.forEach(doc => {
+      //   const userData = doc.data().userData;
+      //   const postText = doc.data().text;
+      //   const mediaUrls = doc.data().media;
+      //   const createdAt = doc.data().createdAt;
+
+      //   // Create a post object with the required data
+      //   const post = {
+      //     userData,
+      //     postText,
+      //     mediaUrls,
+      //     createdAt,
+      //   };
+
+      //   allPosts.push(post);
+      // });
+      // console.log(allPosts, 'Allposts');
+
+      // setUserData(allPosts);
+    };
+
+    fetchData();
+  }, []);
+
+
+  const shuffleArray = (array) => {
+    // Fisher-Yates shuffle algorithm
+    let currentIndex = array.length;
+    let temporaryValue, randomIndex;
+
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+  };
 
   const handleSearchButtonPress = () => {
     setShowSearchInput(false);
   };
+
   const handleCancleButtonPress = () => {
     setShowSearchInput(true);
   };
+
   const handleSearchInputChange = text => {
     setSearchText(text);
   };
+
   const handlecancletextButton = () => {
-    setSearchText(' ');
+    setSearchText('');
+  };
+
+  const renderPostCard = ({item}) => {
+    console.log(item.userData.images, 'item');
+    return (
+      <PostCard
+        username={item?.userData.username}
+        desc={item?.text}
+        media={item?.media}
+        // profileImgs={item?.userData.images}
+        Source={item?.userData.images}
+      />
+    );
   };
 
   return (
@@ -123,7 +211,7 @@ const Deshbord = () => {
             <TouchableOpacity
               style={{marginLeft: 20}}
               onPress={handleCancleButtonPress}>
-              <Text style={{color: 'blue'}}>Cancle</Text>
+              <Text style={{color: 'blue'}}>Cancel</Text>
             </TouchableOpacity>
           </View>
           <View
@@ -137,9 +225,18 @@ const Deshbord = () => {
             }}></View>
         </View>
       )}
-      <PostCard />
+      {userData.length === 0 ? (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <ActivityIndicator animating={true} size={'large'} color={'blue'} />
+        </View>
+      ) : (
+        <FlatList
+          data={userData}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderPostCard}
+        />
+      )}
     </View>
-
   );
 };
 

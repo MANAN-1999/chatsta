@@ -8,20 +8,29 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import CHeder from '../../component/CHeder';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import Video from 'react-native-video';
+import {useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 
 const Post = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+  const [postText, setPostText] = useState('');
   const [selectedMedia, setSelectedMedia] = useState([]);
   const {width, height} = Dimensions.get('window');
   const videoRefs = useRef([]);
   const [isPlaying, setIsPlaying] = useState([]);
+  const [isLoding, setIsLoding] = useState(false);
+  const data = useSelector(state => state.userData.userData);
+  // console.log(data, 'data');
 
   // For Bottom Tab Bar Close On Post Screen
   useLayoutEffect(() => {
@@ -46,6 +55,7 @@ const Post = () => {
 
         media.forEach(item => {
           if (item.mime.startsWith('image')) {
+            console.log(item, 'item');
             newSelectedMedia.push({type: 'image', path: item.path});
           } else if (item.mime.startsWith('video')) {
             newSelectedMedia.push({type: 'video', path: item.path});
@@ -76,6 +86,61 @@ const Post = () => {
     }
   };
 
+  const uploadMediaToStorage = async media => {
+    try {
+      const promises = media.map(async item => {
+        if (item.type === 'image') {
+          const reference = storage().ref(`images/${Date.now()}`);
+          await reference.putFile(item.path);
+          const downloadURL = await reference.getDownloadURL();
+          return {type: 'image', url: downloadURL};
+        } else if (item.type === 'video') {
+          const reference = storage().ref(`videos/${Date.now()}`);
+          await reference.putFile(item.path);
+          const downloadURL = await reference.getDownloadURL();
+          return {type: 'video', url: downloadURL};
+        }
+      });
+
+      return Promise.all(promises);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlePost = async () => {
+    try {
+      setIsLoding(true);
+      console.log(data, 'data');
+      const uploadedMediaUrls = await uploadMediaToStorage(selectedMedia);
+      // Create a new post document in Firestore
+      const postRef = await firestore()
+        .collection('posts')
+        .doc(data?.username)
+        .collection('allposts');
+      postRef
+        .add({
+          text: postText,
+          media: uploadedMediaUrls,
+          userData: data,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        })
+
+        .then(() => {
+          setIsLoding(false);
+          navigation.goBack();
+          console.log('Success.........');
+          console.log(uploadedMediaUrls, 'uploadedMediaUrls');
+          console.log(postText, 'postText');
+        });
+
+      // Navigate to another screen and pass the post ID as a parameter
+      // navigation.navigate('TabNavigation', { postId: postRef.id });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -92,6 +157,7 @@ const Post = () => {
         isize={30}
         onpress={() => navigation.goBack()}
       />
+
       <View
         style={{
           height: '80%',
@@ -100,78 +166,93 @@ const Post = () => {
           alignSelf: 'center',
           marginTop: 10,
         }}>
-        <TextInput
-          placeholder="What's new? "
-          placeholderTextColor={'gray'}
-          multiline={true}
-          style={{marginTop: 2, fontSize: 20, color: 'black'}}
-        />
+        {isLoding ? (
+          <View
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <ActivityIndicator animating={true} size={'large'} color={'blue'} />
+          </View>
+        ) : (
+          <>
+            <TextInput
+              placeholder="What's new? "
+              placeholderTextColor={'gray'}
+              multiline={true}
+              style={{marginTop: 2, fontSize: 20, color: 'black'}}
+              alue={postText}
+              onChangeText={setPostText}
+            />
 
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 10,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          {selectedMedia.map((item, index) => (
-            <View key={index} style={{position: 'relative'}}>
-              {item.type === 'image' ? (
-                <Image
-                  source={{uri: item.path}}
-                  style={{
-                    width: width / 3,
-                    height: 120,
-                    resizeMode: 'stretch',
-                    borderRadius: 20,
-                  }}
-                />
-              ) : item.type === 'video' ? (
-                <TouchableOpacity
-                  onPress={() => togglePlay(index)}
-                  style={{marginRight: 5}}>
-                  <View
-                    style={{
-                      width: width / 1.9,
-                      height: 120,
-                      alignItems: 'center',
-                      borderRadius: 20,
-                    }}>
-                    <Video
-                      ref={ref => (videoRefs.current[index] = ref)}
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 10,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+              {selectedMedia.map((item, index) => (
+                <View key={index} style={{position: 'relative'}}>
+                  {item.type === 'image' ? (
+                    <Image
                       source={{uri: item.path}}
-                      style={{width: '100%', height: '100%', borderRadius: 20}}
-                      resizeMode="stretch"
-                      controls={false}
-                      repeat
-                      paused={!isPlaying[index]}
+                      style={{
+                        width: width / 3,
+                        height: 120,
+                        resizeMode: 'stretch',
+                        borderRadius: 20,
+                      }}
                     />
-                    {!isPlaying[index] && (
-                      <View style={styles.playButton}>
-                        <Ionicons name="play" color={'white'} size={20} />
+                  ) : item.type === 'video' ? (
+                    <TouchableOpacity
+                      onPress={() => togglePlay(index)}
+                      style={{marginRight: 5}}>
+                      <View
+                        style={{
+                          width: width / 1.9,
+                          height: 120,
+                          alignItems: 'center',
+                          borderRadius: 20,
+                        }}>
+                        <Video
+                          ref={ref => (videoRefs.current[index] = ref)}
+                          source={{uri: item.path}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: 20,
+                          }}
+                          resizeMode="stretch"
+                          controls={false}
+                          repeat
+                          paused={!isPlaying[index]}
+                        />
+                        {!isPlaying[index] && (
+                          <View style={styles.playButton}>
+                            <Ionicons name="play" color={'white'} size={20} />
+                          </View>
+                        )}
                       </View>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              ) : null}
+                    </TouchableOpacity>
+                  ) : null}
 
-              <TouchableOpacity
-                onPress={() => {
-                  const updatedSelectedMedia = selectedMedia.filter(
-                    (_, i) => i !== index,
-                  );
-                  const updatedIsPlaying = isPlaying.filter(
-                    (_, i) => i !== index,
-                  );
-                  setSelectedMedia(updatedSelectedMedia);
-                  setIsPlaying(updatedIsPlaying);
-                }}
-                style={styles.deleteButton}>
-                <Ionicons name="md-trash-bin" size={20} color={'blue'} />
-              </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      const updatedSelectedMedia = selectedMedia.filter(
+                        (_, i) => i !== index,
+                      );
+                      const updatedIsPlaying = isPlaying.filter(
+                        (_, i) => i !== index,
+                      );
+                      setSelectedMedia(updatedSelectedMedia);
+                      setIsPlaying(updatedIsPlaying);
+                    }}
+                    style={styles.deleteButton}>
+                    <Ionicons name="md-trash-bin" size={20} color={'blue'} />
+                  </TouchableOpacity>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
+          </>
+        )}
       </View>
 
       <View
@@ -192,6 +273,7 @@ const Post = () => {
           </TouchableOpacity>
         </View>
         <TouchableOpacity
+          onPress={handlePost}
           style={{
             width: '50%',
             height: 50,

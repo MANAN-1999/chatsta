@@ -13,7 +13,7 @@ const AlmostDone = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [selectedItems, setSelectedItems] = useState([]);
-  const {data} = useSelector(state => state.user);
+  const data = useSelector(state => state.user.data);
   const [isFocused, setIsFocused] = useState(false);
   const [height, setHeight] = useState('');
   const [quotes, setQuotes] = useState('');

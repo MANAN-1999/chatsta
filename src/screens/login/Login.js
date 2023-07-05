@@ -13,7 +13,10 @@ import * as Yup from 'yup';
 import CTextinput from '../../component/CTextinput';
 import CButton from '../../component/CButton';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
+import {useDispatch, useSelector} from 'react-redux';
+import {setUserData} from '../../redux/Slices/UserDataSlice';
 
 const LoginSchema = Yup.object().shape({
   username: Yup.string().required('Username is required'),
@@ -24,22 +27,50 @@ const LoginSchema = Yup.object().shape({
 
 const Login = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  const checkLoginStatus = async () => {
+    try {
+      const value = await AsyncStorage.getItem('loggedIn');
+      if (value === 'true') {
+        // User is already logged in, navigate to the dashboard screen
+
+        navigation.navigate('TabNavtigation');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getList = async values => {
-    let userRef = await firestore().collection('Users').get();
-    return userRef.docs.map(
-      i =>
-        i.data().username == values.username &&
-        i.data().password == values.password,
-    );
+    const querySnapshot = await firestore()
+      .collection('Users')
+      .where('username', '==', values.username)
+      .where('password', '==', values.password)
+      .limit(1)
+      .get();
+
+    if (!querySnapshot.empty) {
+      const userData = querySnapshot.docs[0].data();
+      return {hasMatch: true, userData};
+    } else {
+      return {hasMatch: false, userData: null};
+    }
   };
+
   const handleFormSubmit = values => {
-    console.log(values);
-    getList(values).then(res => {
-      if (res[0] == true) {
+    getList(values).then(({hasMatch, userData}) => {
+      console.log(hasMatch, 'hasMatch');
+      if (hasMatch) {
+        AsyncStorage.setItem('loggedIn', 'true');
+        dispatch(setUserData(userData)); // Dispatch the action with user data
         navigation.navigate('TabNavtigation');
       } else {
-        Alert.alert('Warning', 'Invalid Cradentials');
+        Alert.alert('Warning', 'Invalid Credentials');
       }
     });
   };

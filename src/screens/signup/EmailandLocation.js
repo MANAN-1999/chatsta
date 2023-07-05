@@ -22,7 +22,7 @@ import {setuserEmail} from '../../redux/Slices/UserSlice';
 const EmailandLocation = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {data} = useSelector(state => state.user);
+  const data = useSelector(state => state.user.data);
   console.log(data, 'data');
 
   const [Email, setEmail] = useState('');

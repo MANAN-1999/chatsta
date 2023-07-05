@@ -38,7 +38,7 @@ const LoginSchema = Yup.object().shape({
 const SignUp = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {data} = useSelector(state => state.user);
+  const data = useSelector(state => state.user.data);
   console.log(data, 'data');
 
   const handleFormSubmit = values => {

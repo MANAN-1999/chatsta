@@ -153,33 +153,61 @@ export const intrestlist = [
 
 export const emojis = [
   {
-    id:1,
+    id: 1,
     image: require('../images/love.png'),
     price: '',
   },
   {
-    id:2,
+    id: 2,
     image: require('../images/eww.png'),
     price: '',
   },
   {
-    id:3,
+    id: 3,
     image: require('../images/inlove.png'),
     price: '50c',
   },
   {
-    id:4,
+    id: 4,
     image: require('../images/goodjob.png'),
     price: '£1',
   },
   {
-    id:5,
+    id: 5,
     image: require('../images/money.png'),
     price: '£2',
   },
   {
-    id:6,
+    id: 6,
     image: require('../images/verynice.png'),
     price: '£3',
+  },
+];
+
+export const chatusername = [
+  {
+    id: 1,
+    name: 'Kinana',
+    lastmassage: 'Show the last messages',
+  },
+  {
+    id: 2,
+    name: 'Vidish',
+    lastmassage: 'Show the last messages',
+  },
+  {
+    id: 3,
+    name: 'gaurav',
+    lastmassage: 'Show the last messages',
+  },
+  {
+    id: 4,
+    name: 'Krunal',
+    lastmassage: 'Show the last messages',
+  },
+  {
+    id: 5,
+    name: 'Nariyel',
+    lastmassage: 'Show the last messages',
   },
 ];

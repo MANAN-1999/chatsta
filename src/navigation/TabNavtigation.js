@@ -21,8 +21,8 @@ const TabNavtigation = () => {
           elevation: 10,
         },
         tabBarInactiveTintColor: 'gray',
-        tabBarActiveTintColor: 'green',
-        tabBarActiveBackgroundColor: 'blue',
+        tabBarActiveTintColor: 'snow',
+        tabBarActiveBackgroundColor: '#5c76db',
         tabBarItemStyle: {
           // alignItems:'center',
           justifyContent: 'center',
@@ -50,7 +50,7 @@ const TabNavtigation = () => {
         options={{
           tabBarLabelStyle: {display: 'none'},
           tabBarIcon: ({color, size}) => (
-            <Ionicons name="md-home-sharp" color={color} size={size} />
+            <Ionicons name="md-chatbox-ellipses-outline" color={color} size={size} />
           ),
         }}
       />
@@ -76,12 +76,12 @@ const TabNavtigation = () => {
           tabBarIcon: ({color, size}) => (
             <View
               style={{
-                height: 60,
-                width: 60,
+                height: 70,
+                width: 70,
 
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 30,
+                borderRadius: 35,
                 // elevation:6,
                 overflow: 'hidden',
                 top: -40,
@@ -91,8 +91,12 @@ const TabNavtigation = () => {
                   height: '90%',
                   width: '90%',
                   borderRadius: 30,
-                  backgroundColor: 'red',
-                }}></View>
+                  backgroundColor: 'yellow',
+                  alignItems:'center',
+                  justifyContent:'center'
+                }}>
+                  <Ionicons name="md-add-sharp" color={'black'} size={50}/>
+                </View>
             </View>
           ),
         }}
@@ -103,7 +107,7 @@ const TabNavtigation = () => {
         options={{
           tabBarLabelStyle: {display: 'none'},
           tabBarIcon: ({color, size}) => (
-            <Ionicons name="md-home-sharp" color={color} size={size} />
+            <Ionicons name="md-person" color={color} size={size} />
           ),
         }}
       />
@@ -113,7 +117,7 @@ const TabNavtigation = () => {
         options={{
           tabBarLabelStyle: {display: 'none'},
           tabBarIcon: ({color, size}) => (
-            <Ionicons name="md-home-sharp" color={color} size={size} />
+            <Ionicons name="settings-sharp" color={color} size={size} />
           ),
         }}
       />

@@ -84,7 +84,7 @@ const IconCategory = ({
 const Moreaboutyou = () => {
   const navigate = useNavigation();
   const dispatch = useDispatch();
-  const {data} = useSelector(state => state.user);
+  const data = useSelector(state => state.user.data);
   console.log(data, 'data');
   // const [alldata,SetAllData] = useState([])
   // const [alldata, setAllData] = useState({});

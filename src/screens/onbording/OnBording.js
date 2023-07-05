@@ -7,18 +7,17 @@ const OnBording = () => {
   const navigation = useNavigation();
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate('Login');
+      navigation.replace('Login');
     }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
 
-
   return (
     <View style={{flex: 1}}>
       <TouchableOpacity
         style={{
-          flex: 1
+          flex: 1,
         }}>
         <Image
           source={require('../../assets/images/onbording.png')}

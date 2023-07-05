@@ -1,3 +1,4 @@
+import React, {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -5,68 +6,126 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  Dimensions,
+  ScrollView,
 } from 'react-native';
-import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {emojis} from '../assets/data/dummydata';
+import Video from 'react-native-video';
 
-const PostCard = () => {
+const {width, height} = Dimensions.get('window');
+const PostCard = ({username, desc, media, profileImgs, Source}) => {
+  const videoRefs = useRef([]);
+  const [isPlaying, setIsPlaying] = useState([]);
+
+  useEffect(() => {
+    const initialIsPlaying = media.map(() => false);
+    setIsPlaying(initialIsPlaying);
+  }, [media]);
+
+  const togglePlay = index => {
+    const videoRef = videoRefs.current[index];
+    if (videoRef) {
+      videoRef.presentFullscreenPlayer();
+      setIsPlaying(prevIsPlaying => {
+        const updatedIsPlaying = [...prevIsPlaying];
+        updatedIsPlaying[index] = !updatedIsPlaying[index];
+        return updatedIsPlaying;
+      });
+    }
+  };
   return (
     <View style={styles.container}>
-      <View style={styles.hedermainview}>
-        <View style={styles.hprofile}>
-          <TouchableOpacity style={styles.profileimg}></TouchableOpacity>
-          <View style={styles.profilename}>
-            <Text style={[styles.desctxt,{marginTop:0}]}>Kewin Hayward</Text>
-            <Text style={[styles.desctxt,{marginTop:0}]}>Today at 5:15 pm</Text>
+      <View style={styles.headerMainView}>
+        <View style={styles.profile}>
+          <TouchableOpacity style={styles.profileImg}>
+            <Image source={{uri:Source[0]}} style={{height: '100%', width: '100%'}} />
+          </TouchableOpacity>
+          <View style={styles.profileName}>
+            <Text style={[styles.descText, {marginTop: 0}]}>{username}</Text>
+            <Text style={[styles.descText, {marginTop: 0}]}>
+              Today at 5:15 pm
+            </Text>
           </View>
         </View>
         <TouchableOpacity>
-        <Ionicons
-          name={'ios-ellipsis-horizontal-sharp'}
-          size={20}
-          color={'black'}
-        />
-         </TouchableOpacity>
+          <Ionicons
+            name="ios-ellipsis-horizontal-sharp"
+            size={20}
+            color="black"
+          />
+        </TouchableOpacity>
       </View>
-      <Text style={styles.desctxt}>
-        We upload the new vedio every week! Don't Forgot to suscribe and share
-        the vedio!
-      </Text>
-      <View style={styles.imagecontainer}>
-        <Image
-          source={require('../assets/images/beach.jpg')}
-          style={styles.image}
-        />
-        <Text style={styles.itemname}>hello my name is xyz</Text>
-      </View>
-      <View style={styles.emojicontaner}>
+      <Text style={[styles.descText,{marginLeft:10}]}>{desc}</Text>
+
+      <ScrollView
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}>
+        <View style={{flexDirection: 'row'}}>
+
+          {media.map((item, index) => {
+            return item.type === 'video' ? (
+              <TouchableOpacity
+                key={index}
+                style={styles.vediomediaItem}
+                onPress={() => togglePlay(index)}>
+                <View>
+                  <Video
+                    ref={ref => (videoRefs.current[index] = ref)}
+                    source={{uri: item.url}}
+                    style={styles.video}
+                    resizeMode="stretch"
+                    controls={false}
+                    repeat
+                    paused={!isPlaying[index]}
+                  />
+                  {!isPlaying[index] && (
+                    <View style={styles.playButton}>
+                      <Ionicons name="play" color={'white'} size={20} />
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            ) : item.type === 'image' ? (
+              <View key={index} style={styles.mediaItem}>
+                <Image source={{uri: item.url}} style={styles.image} />
+              </View>
+            ) : null;
+          })}
+        </View>
+      </ScrollView>
+
+     
+
+      <View style={styles.emojiContainer}>
         {emojis.map((item, index) => (
-          <TouchableOpacity style={{alignItems: 'center'}}>
-            <Image source={item.image} style={styles.emojiimage} />
-            <View style={styles.emojitxtbackground}>
-              {item.price !== '' && (
-                <Text style={styles.emojitxt}>{item.price}</Text>
-              )}
-            </View>
+          <TouchableOpacity key={index} style={styles.emojiItem}>
+            <Image source={item.image} style={styles.emojiImage} />
+            {item.price !== '' && (
+              <View style={styles.emojiTextBackground}>
+                <Text style={styles.emojiText}>{item.price}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         ))}
       </View>
+
       <TouchableOpacity activeOpacity={0.7}>
-        <View style={styles.commentbtn}>
+        <View style={styles.commentBtn}>
           <Ionicons
-            name={'md-chatbox-ellipses-outline'}
+            name="md-chatbox-ellipses-outline"
             size={25}
-            color={'black'}
+            color="black"
           />
-          <Text style={styles.commentstyle}>2 Comments</Text>
+          <Text style={styles.commentStyle}>2 Comments</Text>
         </View>
-        <View style={styles.commnentcontainer}>
-          <Ionicons name="md-add-circle" size={25} color={'black'} />
-          <TouchableOpacity style={styles.commentxtinput}>
-            <Text style={styles.commenttxt}>write a comment</Text>
+        <View style={styles.commentContainer}>
+          <Ionicons name="md-add-circle" size={25} color="black" />
+          <TouchableOpacity style={styles.commentInput}>
+            <Text style={styles.commentText}>write a comment</Text>
           </TouchableOpacity>
-          <Ionicons name="md-arrow-up-circle-sharp" size={25} color={'black'} />
+          <Ionicons name="md-arrow-up-circle-sharp" size={25} color="black" />
         </View>
       </TouchableOpacity>
     </View>
@@ -78,103 +137,139 @@ export default PostCard;
 const styles = StyleSheet.create({
   container: {
     width: '95%',
-    height: '80%',
+    height: 'auto',
     backgroundColor: 'snow',
     alignSelf: 'center',
+    paddingBottom: 12,
     padding: 10,
     borderRadius: 20,
     elevation: 5,
+    marginVertical: 12,
   },
-  hedermainview: {
+  headerMainView: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  hprofile: {
+  profile: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  profileimg: {
+  profileImg: {
     height: 50,
     width: 50,
     backgroundColor: 'red',
     borderRadius: 25,
+    overflow: 'hidden',
   },
-  profilename: {
+  profileName: {
     marginLeft: 10,
-    color:'black'
+    color: 'black',
   },
-  desctxt: {
+  descText: {
     marginTop: 10,
-    color:'black'
+    color: 'black',
+    marginBottom:10,
   },
-  imagecontainer: {
+  mediaContainer: {
     marginTop: 10,
-    height: 'auto',
+    flexDirection: 'row',
+    height: 200,
+    // width: 'auto',
   },
-  emojiimage: {
-    height: 30,
-    width: 30,
+  mediaItem: {
+    marginRight: 10,
+    marginLeft: 5,
+    width: width * 0.85,
+  },
+  vediomediaItem: {
+    width: width * 0.9,
+    // backgroundColor:'blue'
+  },
+  videoWrapper: {
+    height: 200,
     alignItems: 'center',
+    borderRadius: 20,
+  },
+  video: {
+    width: 'auto',
+    height: 200,
+    borderRadius: 20,
   },
   image: {
     width: '100%',
-    height: 250,
+    height: 200,
     resizeMode: 'contain',
     borderRadius: 20,
   },
-  itemname: {
+  itemName: {
     marginTop: 5,
     marginLeft: 10,
     fontSize: 15,
     fontWeight: '500',
     color: 'black',
   },
-  emojicontaner: {
+  emojiContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    // backgroundColor: 'blue',
     marginTop: 20,
   },
-  emojitxtbackground: {
-    height: 'auto',
+  emojiItem: {
+    alignItems: 'center',
+  },
+  emojiImage: {
+    height: 30,
+    width: 30,
+  },
+  emojiTextBackground: {
     width: 35,
     backgroundColor: 'blue',
     borderRadius: 13,
-    marginTop: 10
+    marginTop: 10,
   },
-  emojitxt: {
+  emojiText: {
     color: 'snow',
     textAlign: 'center',
     fontSize: 10,
   },
-  commentbtn: {
+  commentBtn: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  commentstyle: {
+  commentStyle: {
     fontSize: 14,
     textAlign: 'center',
     color: 'black',
     marginLeft: 7,
   },
-  commnentcontainer: {
+  commentContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 10,
   },
-  commentxtinput: {
+  commentInput: {
     width: '82%',
     height: 35,
     borderRadius: 17,
     borderWidth: 1,
     justifyContent: 'center',
   },
-  commenttxt: {
+  commentText: {
     marginLeft: 20,
     color: 'black',
     opacity: 0.6,
     fontSize: 15,
+  },
+  playButton: {
+    position: 'absolute',
+    left: width / 2.3,
+    top: 75,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
