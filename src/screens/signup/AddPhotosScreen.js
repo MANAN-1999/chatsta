@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import CImageard from '../../component/CImageard';
 import CButton from '../../component/CButton';
@@ -15,6 +21,7 @@ const AddPhotosScreen = () => {
   const data = useSelector(state => state.user.data);
   console.log(data, 'data');
   const [imageArray, setImageArray] = useState([]);
+  const [isLoding, setIsLoding] = useState(false);
 
   // const uploadImage = async image => {
   //   const {path} = image;
@@ -111,10 +118,12 @@ const AddPhotosScreen = () => {
 
   const handleNext = async () => {
     try {
+      setIsLoding(true);
       uploadImagesToStorage(imageArray)
         .then(async uploadedImageUrls => {
           console.log(uploadedImageUrls, 'uploadedImageUrls');
           dispatch(setAddImage(uploadedImageUrls));
+          setIsLoding(false);
           navigation.navigate('Moreaboutyou');
         })
         .catch(error => {
@@ -127,39 +136,47 @@ const AddPhotosScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{addphoto}</Text>
-      <Text style={styles.subtitle}>{addphotodesc}</Text>
-      <View style={styles.mainPhotoContainer}>
-        <CImageard
-          title="Click here to upload main photo"
-          oterstyle={{height: '100%', borderRadius: 20}}
-          onSelectImage={handleImageSelect}
-          onImageDelete={handleImageDelete}
-        />
-      </View>
-      <View style={styles.additionalPhotosContainer}>
-        <CImageard
-          oterstyle={styles.comCard}
-          onSelectImage={handleImageSelect1}
-          onImageDelete={handleImageDelete}
-        />
-        <CImageard
-          oterstyle={styles.comCard}
-          onSelectImage={handleImageSelect2}
-          onImageDelete={handleImageDelete}
-        />
-        <CImageard
-          oterstyle={styles.comCard}
-          onSelectImage={handleImageSelect3}
-          onImageDelete={handleImageDelete}
-        />
-        <CImageard
-          oterstyle={styles.comCard}
-          onSelectImage={handleImageSelect4}
-          onImageDelete={handleImageDelete}
-        />
-      </View>
-
+    
+          <Text style={styles.title}>{addphoto}</Text>
+          <Text style={styles.subtitle}>{addphotodesc}</Text>
+          {isLoding ? (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <ActivityIndicator animating={true} size={'large'} color={'blue'} />
+        </View>
+      ) : (
+        <>
+          <View style={styles.mainPhotoContainer}>
+            <CImageard
+              title="Click here to upload main photo"
+              oterstyle={{height: '100%', borderRadius: 20}}
+              onSelectImage={handleImageSelect}
+              onImageDelete={handleImageDelete}
+            />
+          </View>
+          <View style={styles.additionalPhotosContainer}>
+            <CImageard
+              oterstyle={styles.comCard}
+              onSelectImage={handleImageSelect1}
+              onImageDelete={handleImageDelete}
+            />
+            <CImageard
+              oterstyle={styles.comCard}
+              onSelectImage={handleImageSelect2}
+              onImageDelete={handleImageDelete}
+            />
+            <CImageard
+              oterstyle={styles.comCard}
+              onSelectImage={handleImageSelect3}
+              onImageDelete={handleImageDelete}
+            />
+            <CImageard
+              oterstyle={styles.comCard}
+              onSelectImage={handleImageSelect4}
+              onImageDelete={handleImageDelete}
+            />
+          </View>
+        </>
+      )}
       <CButton
         btntxt={'Next'}
         otherstyle={styles.button}

@@ -22,6 +22,7 @@ import Yahoo from '../screens/signup/Yahoo';
 import TabNavtigation from './TabNavtigation';
 import Accounts from '../screens/settings/Accounts';
 import ChatScreen from '../screens/messages/ChatScreen';
+import ContactList from '../screens/messages/ContactList/ContactList';
 const Stack = createNativeStackNavigator();
 const HomeStack = () => {
   return (
@@ -48,6 +49,7 @@ const HomeStack = () => {
       <Stack.Screen name="TabNavtigation" component={TabNavtigation} />
       <Stack.Screen name='Accounts' component={Accounts}/>
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
+      <Stack.Screen name="ContactList" component={ContactList} />
     </Stack.Navigator>
   );
 };

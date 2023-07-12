@@ -12,6 +12,7 @@ const CHeder = ({
   isIcon,
   profileimg,
   imgstyle,
+  image
 }) => {
   return (
     <View style={[styles.continer, otherstyle]}>
@@ -20,8 +21,8 @@ const CHeder = ({
           <Ionicons name={ficone} size={isize} color={'gray'} />
         </TouchableOpacity>
       ) : (
-       <TouchableOpacity style={{height:50,width:50,backgroundColor:'red',borderRadius:25}}>
-       <Image  />
+       <TouchableOpacity style={{height:40,width:40,backgroundColor:'red',borderRadius:20,marginBottom:3}}>
+       <Image  source={image} />
        </TouchableOpacity>
        
       )}

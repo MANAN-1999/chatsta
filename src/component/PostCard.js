@@ -39,7 +39,11 @@ const PostCard = ({username, desc, media, profileImgs, Source}) => {
       <View style={styles.headerMainView}>
         <View style={styles.profile}>
           <TouchableOpacity style={styles.profileImg}>
-            <Image source={{uri:Source[0]}} style={{height: '100%', width: '100%'}} />
+            <Image
+              source={{uri: Source[0]}}
+              style={{height: '100%', width: '100%'}}
+            />
+            
           </TouchableOpacity>
           <View style={styles.profileName}>
             <Text style={[styles.descText, {marginTop: 0}]}>{username}</Text>
@@ -56,14 +60,13 @@ const PostCard = ({username, desc, media, profileImgs, Source}) => {
           />
         </TouchableOpacity>
       </View>
-      <Text style={[styles.descText,{marginLeft:10}]}>{desc}</Text>
+      <Text style={[styles.descText, {marginLeft: 10}]}>{desc}</Text>
 
       <ScrollView
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}>
         <View style={{flexDirection: 'row'}}>
-
           {media.map((item, index) => {
             return item.type === 'video' ? (
               <TouchableOpacity
@@ -89,14 +92,12 @@ const PostCard = ({username, desc, media, profileImgs, Source}) => {
               </TouchableOpacity>
             ) : item.type === 'image' ? (
               <View key={index} style={styles.mediaItem}>
-                <Image source={{uri: item.url}} style={styles.image} />
+                <Image source={{uri: item.url}} style={styles.image}  />
               </View>
             ) : null;
           })}
         </View>
       </ScrollView>
-
-     
 
       <View style={styles.emojiContainer}>
         {emojis.map((item, index) => (
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     height: 'auto',
     backgroundColor: 'snow',
     alignSelf: 'center',
-    paddingBottom: 12,
+    paddingBottom: 35,
     padding: 10,
     borderRadius: 20,
     elevation: 5,
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
   descText: {
     marginTop: 10,
     color: 'black',
-    marginBottom:10,
+    marginBottom: 10,
   },
   mediaContainer: {
     marginTop: 10,
@@ -181,6 +182,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginLeft: 5,
     width: width * 0.85,
+    backgroundColor:'#FFFFF'
   },
   vediomediaItem: {
     width: width * 0.9,
@@ -197,10 +199,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   image: {
-    width: '100%',
+    width:'auto',
     height: 200,
     resizeMode: 'contain',
-    borderRadius: 20,
+    overflow:'hidden'
+    // borderRadius: 20,
   },
   itemName: {
     marginTop: 5,

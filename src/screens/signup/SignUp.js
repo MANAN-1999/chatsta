@@ -63,7 +63,7 @@ const SignUp = () => {
           fontWeight: 'bold',
           //   marginTop: 10,
         }}
-        x>
+        >
         Create Account
       </Text>
       <Formik

@@ -39,7 +39,6 @@ const Post = () => {
 
   useEffect(() => {
     if (!isFocused) {
-      // Reset selected images and videos when navigating away from the screen
       setSelectedMedia([]);
       setIsPlaying([]);
     }
@@ -49,9 +48,10 @@ const Post = () => {
     ImageCropPicker.openPicker({
       mediaType: 'any',
       multiple: true,
+      cropping: true,
     })
       .then(media => {
-        const newSelectedMedia = [...selectedMedia]; // Create a copy of the current selected media
+        const newSelectedMedia = [...selectedMedia];
 
         media.forEach(item => {
           if (item.mime.startsWith('image')) {
@@ -108,18 +108,36 @@ const Post = () => {
     }
   };
 
+  const PostuId = () => {
+    const length = 10;
+    let id = '';
+
+    const characters = '0123456789';
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charactersLength);
+      id += characters.charAt(randomIndex);
+    }
+
+    return id;
+  };
+
   const handlePost = async () => {
     try {
       setIsLoding(true);
       console.log(data, 'data');
       const uploadedMediaUrls = await uploadMediaToStorage(selectedMedia);
-      // Create a new post document in Firestore
+      const docPostId = PostuId();
+
       const postRef = await firestore()
         .collection('posts')
-        .doc(data?.username)
+        .doc(data?.docId)
         .collection('allposts');
+
       postRef
         .add({
+          PostuId: docPostId,
           text: postText,
           media: uploadedMediaUrls,
           userData: data,
@@ -127,8 +145,8 @@ const Post = () => {
         })
 
         .then(() => {
-          setIsLoding(false);
           navigation.goBack();
+          setIsLoding(false);
           console.log('Success.........');
           console.log(uploadedMediaUrls, 'uploadedMediaUrls');
           console.log(postText, 'postText');
@@ -169,7 +187,11 @@ const Post = () => {
         {isLoding ? (
           <View
             style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <ActivityIndicator animating={true} size={'large'} color={'blue'} />
+            <ActivityIndicator
+              animating={isLoding}
+              size={'large'}
+              color={'blue'}
+            />
           </View>
         ) : (
           <>

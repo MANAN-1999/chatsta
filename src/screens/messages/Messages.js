@@ -1,19 +1,18 @@
 import {
-  SafeAreaView,
-  StyleSheet,
   Text,
-  TextInput,
   View,
-  Dimensions,
-  TouchableOpacity,
-  FlatList,
   Image,
+  FlatList,
+  TextInput,
+  StyleSheet,
+  Dimensions,
+  SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
 import {useSelector} from 'react-redux';
 import CHeder from '../../component/CHeder';
 import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {chatusername} from '../../assets/data/dummydata';
 import firestore from '@react-native-firebase/firestore';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
@@ -23,6 +22,7 @@ const {width, height} = Dimensions.get('window');
 const Messages = () => {
   const [userList, setUserList] = useState([]);
   const data = useSelector(state => state.userData.userData);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const getListUser = async () => {
@@ -100,7 +100,7 @@ const Messages = () => {
       <Text>Group Tab Content</Text>
     </View>
   );
-  const navigation = useNavigation();
+
   const [index, setIndex] = useState(0);
 
   const [routes] = useState([
@@ -129,6 +129,7 @@ const Messages = () => {
         sicone={'ios-create-outline'}
         isize={25}
         otherstyle={{borderBottomWidth: 0}}
+        onpress={() => navigation.navigate('ContactList')}
       />
       <View
         style={{

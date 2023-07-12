@@ -7,6 +7,9 @@ import {
   TextInput,
   FlatList,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -15,6 +18,7 @@ import PostCard from '../../component/PostCard';
 import {useSelector} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 
+const {height, width} = Dimensions.get('window');
 const Deshbord = () => {
   const [showSearchInput, setShowSearchInput] = useState(true);
   const [searchText, setSearchText] = useState('');
@@ -35,11 +39,9 @@ const Deshbord = () => {
         console.log(sortedPosts, 'sortedPosts');
         setUserData(sortedPosts);
 
-
         console.log(allMsg, 'allMsg');
         setUserData(allMsg);
         // setMessages(allMsg);
-       
       });
       const shuffledPosts = shuffleArray(allMsg); // Shuffle the posts array
       console.log(shuffledPosts, 'shuffledPosts');
@@ -69,8 +71,7 @@ const Deshbord = () => {
     fetchData();
   }, []);
 
-
-  const shuffleArray = (array) => {
+  const shuffleArray = array => {
     // Fisher-Yates shuffle algorithm
     let currentIndex = array.length;
     let temporaryValue, randomIndex;
@@ -117,7 +118,7 @@ const Deshbord = () => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -170,7 +171,7 @@ const Deshbord = () => {
           </View>
         </View>
       ) : (
-        <View>
+        <>
           <View
             style={{
               flexDirection: 'row',
@@ -217,14 +218,15 @@ const Deshbord = () => {
           <View
             style={{
               width: '90%',
-              height: '40%',
+              height: 100,
               backgroundColor: 'red',
               marginTop: 10,
               alignSelf: 'center',
               borderRadius: 10,
             }}></View>
-        </View>
+        </>
       )}
+
       {userData.length === 0 ? (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <ActivityIndicator animating={true} size={'large'} color={'blue'} />
@@ -236,7 +238,7 @@ const Deshbord = () => {
           renderItem={renderPostCard}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

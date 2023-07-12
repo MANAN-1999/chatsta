@@ -11,10 +11,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import CHeder from '../../component/CHeder';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { removeUserData } from '../../redux/Slices/UserDataSlice';
+import {removeUserData} from '../../redux/Slices/UserDataSlice';
 
 const Settings = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const {width, height} = Dimensions.get('window');
   useLayoutEffect(() => {
@@ -23,7 +23,7 @@ const Settings = () => {
 
   const handleRemoveData = () => {
     dispatch(removeUserData());
-     navigation.navigate('Login')
+    navigation.navigate('Login');
   };
 
   return (
@@ -51,7 +51,9 @@ const Settings = () => {
           borderColor: 'gray',
           marginHorizontal: 10,
         }}>
-        <TouchableOpacity style={styles.btnstyle} onPress={()=>navigation.navigate('Accounts')}>
+        <TouchableOpacity
+          style={styles.btnstyle}
+          onPress={() => navigation.navigate('Accounts')}>
           <Ionicons name="md-person-outline" size={25} color={'blue'} />
           <Text style={styles.txt}>Account</Text>
         </TouchableOpacity>
@@ -88,7 +90,7 @@ const Settings = () => {
 
       <TouchableOpacity
         style={{marginLeft: 10, marginTop: 20}}
-          onPress={handleRemoveData}>
+        onPress={handleRemoveData}>
         <Text style={{color: 'red', fontSize: 20, fontWeight: '500'}}>
           Sign Out
         </Text>

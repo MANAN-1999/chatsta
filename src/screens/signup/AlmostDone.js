@@ -1,5 +1,5 @@
 import {intrestlist} from '../../assets/data/dummydata';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {almostdone, lastque} from '../../utils/Strings';
 import CTextinput from '../../component/CTextinput';
@@ -39,6 +39,22 @@ const AlmostDone = () => {
     );
   };
 
+
+
+  const uId = ()=>{
+    const length = 10;
+    let id = '';
+  
+    const characters = '0123456789';
+    const charactersLength = characters.length;
+  
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charactersLength);
+      id += characters.charAt(randomIndex);
+    }
+  
+    return id;
+  }
   useEffect(() => {
     if (selectedItems.length > 0) {
       setIsFocused(true);
@@ -46,10 +62,26 @@ const AlmostDone = () => {
   }, [selectedItems]);
 
   const storeToFirestore = async lastQue => {
-    const collectionRef = firestore().collection('Users');
-    const docRef = collectionRef.doc(data[0].Email);
-    await docRef.set({...data[0], lastQue});
+    const collectionRef =  firestore().collection('Users');
+
+    const email =  await collectionRef.where("Email", "==", data[0].Email).get()
+    const username =  await collectionRef.where("username", "==", data[0].username).get()
+
+    if(email.docs.length !== 0){
+      Alert.alert("Email already exists")
+    
+    }
+
+    if(username.docs.length !== 0){
+      Alert.alert("Username already exists")
+      return
+    }
+
+    const docId = uId()
+    const docRef = collectionRef.doc(data[0].docId);
+    await docRef.set({...data[0], lastQue,id: docId});
     console.log('User Data Stored Successfully');
+    console.log(docId,'docId');
     navigation.navigate('Yahoo');
   };
 
@@ -124,6 +156,7 @@ const AlmostDone = () => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

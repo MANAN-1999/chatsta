@@ -6,7 +6,7 @@ const Yahoo = () => {
     const navigation=useNavigation()
     useEffect(() => {
       const timer = setTimeout(() => {
-        navigation.navigate('TabNavtigation');
+        navigation.navigate('Login');
       }, 2000);
   
       return () => clearTimeout(timer);

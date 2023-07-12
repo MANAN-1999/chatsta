@@ -36,6 +36,7 @@ const userSlice = createSlice({
   },
 });
 
+
 export const {
   setSignUpData,
   setUserName,

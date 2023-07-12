@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Formik} from 'formik';
+import {Formik,useFormikContext} from 'formik';
 import * as Yup from 'yup';
 import CTextinput from '../../component/CTextinput';
 import CButton from '../../component/CButton';
@@ -62,18 +62,30 @@ const Login = () => {
     }
   };
 
-  const handleFormSubmit = values => {
-    getList(values).then(({hasMatch, userData}) => {
-      console.log(hasMatch, 'hasMatch');
-      if (hasMatch) {
-        AsyncStorage.setItem('loggedIn', 'true');
-        dispatch(setUserData(userData)); // Dispatch the action with user data
-        navigation.navigate('TabNavtigation');
-      } else {
-        Alert.alert('Warning', 'Invalid Credentials');
-      }
-    });
+  // const handleFormSubmit = values => {
+  //   getList(values).then(({hasMatch, userData}) => {
+  //     console.log(hasMatch, 'hasMatch');
+  //     if (hasMatch) {
+  //       AsyncStorage.setItem('loggedIn', 'true');
+  //       dispatch(setUserData(userData)); // Dispatch the action with user data
+  //       navigation.navigate('TabNavtigation');
+  //     } else {
+  //       Alert.alert('Warning', 'Invalid Credentials');
+  //     }
+  //   });
+  // };
+  const handleFormSubmit = async (values, { resetForm }) => {
+    const { hasMatch, userData } = await getList(values);
+    if (hasMatch) {
+      AsyncStorage.setItem('loggedIn', 'true');
+      dispatch(setUserData(userData)); // Dispatch the action with user data
+      navigation.navigate('TabNavtigation');
+    } else {
+      Alert.alert('Warning', 'Invalid Credentials');
+    }
+    resetForm(); // Reset the form after submission
   };
+
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="position">
