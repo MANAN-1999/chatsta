@@ -24,20 +24,38 @@ const Messages = () => {
   const data = useSelector(state => state.userData.userData);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const getListUser = async () => {
-      const list = [];
-      const querySnapshot = await firestore()
-        .collection('Users')
-        .where('username', '!=', data?.username)
-        .get();
-      querySnapshot.docs.map((i, e) => {
-        list.push(i.data());
-      });
-      setUserList(list);
-    };
+  // useEffect(() => {
+  //   const getListUser = async () => {
+  //     const list = [];
+  //     const querySnapshot = await firestore()
+  //       .collection('Users')
+  //       .where('username', '!=', data?.username)
+  //       .get();
+  //     querySnapshot.docs.map((i, e) => {
+  //       list.push(i.data());
+  //     });
+  //     setUserList(list);
+  //   };
 
-    getListUser();
+  //   getListUser();
+  // }, []);
+
+  useEffect(() => {
+    const listRef = firestore()
+      .collection('AllUserList')
+      .doc('list')
+      .collection(data?.id)
+      .orderBy('createdAt', 'desc');
+
+    listRef.onSnapshot(querysnap => {
+      const allMsg = querysnap?.docs.map(docsnap => {
+        return {
+          ...docsnap.data(),
+        };
+      });
+      setUserList(allMsg);
+      console.log(allMsg, 'last');
+    });
   }, []);
 
   const recentChatList = ({item, index}) => {
@@ -65,7 +83,7 @@ const Messages = () => {
                   overflow: 'hidden',
                 }}>
                 <Image
-                  source={{uri: item?.images[0]}}
+                  source={{uri: item?.imageURL}}
                   style={{
                     height: '100%',
                     width: '100%',
@@ -75,13 +93,13 @@ const Messages = () => {
               <View style={{width: '80%', marginLeft: 15}}>
                 <Text
                   style={{fontSize: 15, fontWeight: 'bold', color: 'black'}}>
-                  {item.username}
+                  {item?.name}
                 </Text>
                 {/* <Text style={{marginTop: 3, fontSize: 13, color: 'gray'}}>
                   {item.lastmassage}
                 </Text> */}
                 <Text style={{marginTop: 3, fontSize: 13, color: 'gray'}}>
-                  {item.Email}
+                  {item?.lastMessage}
                 </Text>
               </View>
             </View>
@@ -92,7 +110,11 @@ const Messages = () => {
   };
 
   const RecentScreen = () => (
-    <FlatList data={userList} renderItem={recentChatList} />
+    <FlatList
+      data={userList}
+      renderItem={recentChatList}
+      keyExtractor={(_, index) => index}
+    />
   );
 
   const GroupScreen = () => (

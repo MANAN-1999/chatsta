@@ -34,21 +34,10 @@ const ChatScreen = () => {
   }, []);
 
   const getMessages = async () => {
-    // const allMessages = await firestore()
-    //   .collection('chatRoom')
-    //   .doc(data?.username)
-    //   .collection(item?.username)
-    //   .get();
-    // let listMsg = [];
-    // allMessages.docs.map((i, e) => {
-    //   listMsg.push(i.data());
-    // });
-    // setMessages(listMsg);
-
     const msgRef = firestore()
       .collection('chatRoom')
       .doc(data?.username)
-      .collection(item?.username)
+      .collection(item?.name)
       .orderBy('time', 'asc');
 
     msgRef.onSnapshot(querysnap => {
@@ -67,22 +56,68 @@ const ChatScreen = () => {
       const newMessage = {
         text: inputText,
         sender: data?.username,
-        reciver: item?.username,
+        reciver: item?.name,
         time: firestore.FieldValue.serverTimestamp(),
       };
       firestore()
         .collection('chatRoom')
         .doc(data?.username)
-        .collection(item?.username)
+        .collection(item?.name)
         .add(newMessage)
         .then(res => console.log('messages sent'));
 
       firestore()
         .collection('chatRoom')
-        .doc(item?.username)
+        .doc(item?.name)
         .collection(data?.username)
         .add(newMessage)
         .then(res => console.log('messages sent'));
+
+      const Cdata = {
+        name: item?.name,
+        imageURL: item?.images[0],
+        lastMessage: inputText,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+      };
+
+      const Rdata = {
+        name: data?.username,
+        imageURL: data?.images[0],
+        lastMessage: inputText,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+      };
+
+      const check1 = firestore()
+        .collection('AllUserList')
+        .doc('list')
+        .collection(data?.id)
+        .doc(item.id);
+
+      check1.get().then(res => {
+        if (res.exists) {
+          check1.update(Cdata);
+          console.log('Check1 if');
+        } else {
+          check1.set(Cdata);
+          console.log('Check1 else');
+        }
+      });
+
+      const check2 = firestore()
+        .collection('AllUserList')
+        .doc('list')
+        .collection(item.id)
+        .doc(data?.id);
+
+      check2.get().then(res => {
+        if (res.exists) {
+          check2.update(Rdata);
+          console.log('Check2 if');
+        } else {
+          check2.set(Rdata);
+          console.log('Check2 else');
+        }
+      });
 
       setInputText('');
     }
@@ -102,7 +137,7 @@ const ChatScreen = () => {
           <Ionicons name={'md-chevron-back'} size={25} color={'black'} />
         </TouchableOpacity>
         <Text style={{fontSize: 20, fontWeight: 'bold', color: 'black'}}>
-          {item?.username}
+          {item?.name}
         </Text>
         <View>
           <Text>{'    '}</Text>

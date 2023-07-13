@@ -53,6 +53,7 @@ const ContactList = () => {
               width: 50,
               backgroundColor: 'snow',
               borderRadius: 25,
+              
             }}
               source={{uri: item?.images[0]}}
           />
@@ -71,7 +72,7 @@ const ContactList = () => {
         ficone={'md-chevron-back'}
         isize={30}
         title={'Create New Chat'}
-        otherstyle={{width: '90%', alignSelf: 'center'}}
+        otherstyle={{width: '90%', alignSelf: 'center',paddingVertical:10}}
         onpress={()=>navigation.goBack()}
       />
 
