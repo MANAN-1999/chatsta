@@ -19,93 +19,80 @@ import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 
 const {width, height} = Dimensions.get('window');
 
+const grpIcon =
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlolGHpVdG4bh5lkXCCYO68aDJ0Gru8CWeuIcGRQvU&s';
+
 const Messages = () => {
-  const [userList, setUserList] = useState([]);
-  const data = useSelector(state => state.userData.userData);
   const navigation = useNavigation();
+  const [userList, setUserList] = useState([]);
+  const [groupList, setGroupList] = useState([]);
+  const data = useSelector(state => state.userData.userData);
 
-  // useEffect(() => {
-  //   const getListUser = async () => {
-  //     const list = [];
-  //     const querySnapshot = await firestore()
-  //       .collection('Users')
-  //       .where('username', '!=', data?.username)
+  const groupListRef = firestore().collection('Groups');
+
+  // const getGroupList = async userId => {
+  //   try {
+  //     const querySnapshot = await groupListRef
+  //       .where('memberIds', 'array-contains', userId)
   //       .get();
-  //     querySnapshot.docs.map((i, e) => {
-  //       list.push(i.data());
-  //     });
-  //     setUserList(list);
-  //   };
+  //     const groupList = querySnapshot.docs.map(doc => doc.data());
+  //     setGroupList(groupList);
+  //   } catch (error) {
+  //     console.log('Error getting group list:', error);
+  //   }
+  // };
 
-  //   getListUser();
-  // }, []);
+  const getGroupList = async userId => {
+    try {
+      const unsubscribe = groupListRef
+        .where('memberIds', 'array-contains', userId)
+        .onSnapshot(querySnapshot => {
+          const groupList = querySnapshot.docs.map(doc => doc.data());
+          setGroupList(groupList);
+        });
+
+      // Optional: Store the unsubscribe function to unsubscribe from the snapshot listener when needed
+      // For example, you can call `unsubscribe()` to stop listening for updates
+    } catch (error) {
+      console.log('Error getting group list:', error);
+    }
+  };
+
+  useEffect(() => {
+    getGroupList(data?.id);
+  }, []);
 
   useEffect(() => {
     const listRef = firestore()
       .collection('AllUserList')
       .doc('list')
       .collection(data?.id)
-      .orderBy('createdAt', 'desc');
-
-    listRef.onSnapshot(querysnap => {
-      const allMsg = querysnap?.docs.map(docsnap => {
-        return {
-          ...docsnap.data(),
-        };
+      // .orderBy('time', 'desc')
+      .onSnapshot(querySnapshot => {
+        const allUsers = querySnapshot.docs.map(doc => doc.data());
+        setUserList(allUsers);
       });
-      setUserList(allMsg);
-      console.log(allMsg, 'last');
-    });
-  }, []);
+
+    return () => {
+      listRef(); // Unsubscribe from the snapshot listener
+    };
+  }, [data?.id]);
 
   const recentChatList = ({item, index}) => {
     return (
-      <View>
-        <TouchableOpacity
-          style={styles.chatcontainer}
-          key={index}
-          onPress={() => navigation.navigate('ChatScreen', {item: item})}>
-          <View>
-            <View
-              style={{
-                height: 60,
-                borderRadius: 25,
-                width: '90%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingHorizontal: 15,
-              }}>
-              <View
-                style={{
-                  height: 50,
-                  width: 50,
-                  borderRadius: 25,
-                  overflow: 'hidden',
-                }}>
-                <Image
-                  source={{uri: item?.imageURL}}
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                  }}
-                />
-              </View>
-              <View style={{width: '80%', marginLeft: 15}}>
-                <Text
-                  style={{fontSize: 15, fontWeight: 'bold', color: 'black'}}>
-                  {item?.name}
-                </Text>
-                {/* <Text style={{marginTop: 3, fontSize: 13, color: 'gray'}}>
-                  {item.lastmassage}
-                </Text> */}
-                <Text style={{marginTop: 3, fontSize: 13, color: 'gray'}}>
-                  {item?.lastMessage}
-                </Text>
-              </View>
-            </View>
+      <TouchableOpacity
+        style={styles.chatcontainer}
+        onPress={() => navigation.navigate('ChatScreen', {item: item})}>
+        <View style={styles.chatItemContainer}>
+          <View style={styles.avatarContainer}>
+            <Image source={{uri: item?.imageURL}} style={styles.avatar} />
           </View>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.chatDetails}>
+            <Text style={styles.username}>{item?.username}</Text>
+            <Text style={styles.lastMessage}>{item?.lastMessage}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -113,18 +100,46 @@ const Messages = () => {
     <FlatList
       data={userList}
       renderItem={recentChatList}
+      keyExtractor={(_, index) => index.toString()}
+    />
+  );
+
+  const renderGrpCard = ({item, index}) => {
+    const {groupId, groupName} = item;
+
+    const handleGroupPress = () => {
+      navigation.navigate('GroupChat', {groupId, groupName, item});
+    };
+
+    return (
+      <TouchableOpacity style={styles.groupCard} onPress={handleGroupPress}>
+        <Image
+          source={{
+            uri: grpIcon,
+          }}
+          style={{
+            height: 60,
+            width: 60,
+            borderRadius: 30,
+            resizeMode: 'contain',
+          }}
+        />
+        <View style={{marginLeft: 12}}>
+          <Text style={styles.groupName}>{groupName}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const GroupScreen = () => (
+    <FlatList
+      data={groupList}
+      renderItem={renderGrpCard}
       keyExtractor={(_, index) => index}
     />
   );
 
-  const GroupScreen = () => (
-    <View style={styles.chatcontainer}>
-      <Text>Group Tab Content</Text>
-    </View>
-  );
-
   const [index, setIndex] = useState(0);
-
   const [routes] = useState([
     {key: 'recent', title: 'Recent'},
     {key: 'group', title: 'Group'},
@@ -149,21 +164,12 @@ const Messages = () => {
       <CHeder
         title={'Messages'}
         sicone={'ios-create-outline'}
+        image={data?.images[0]}
         isize={25}
         otherstyle={{borderBottomWidth: 0}}
         onpress={() => navigation.navigate('ContactList')}
       />
-      <View
-        style={{
-          flexDirection: 'row',
-          backgroundColor: 'gray',
-          width: '100%',
-          marginTop: 10,
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 10,
-          height: 40,
-        }}>
+      <View style={styles.searchBar}>
         <Ionicons name="search" size={20} color={'black'} />
         <TextInput
           placeholder="Find People And Conversations"
@@ -189,10 +195,56 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'snow',
   },
-  chatcontainer: {
-    flex: 1,
-    width: width,
+  searchBar: {
+    flexDirection: 'row',
+    backgroundColor: 'gray',
+    width: '100%',
     marginTop: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    height: 40,
+  },
+  chatcontainer: {
+    width: '100%',
+    marginTop: 10,
+  },
+  chatItemContainer: {
+    height: 60,
+    borderRadius: 25,
+    width: '90%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  avatarContainer: {
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    overflow: 'hidden',
+  },
+  avatar: {
+    height: '100%',
+    width: '100%',
+  },
+  chatDetails: {
+    width: '80%',
+    marginLeft: 15,
+  },
+  username: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  lastMessage: {
+    marginTop: 3,
+    fontSize: 13,
+    color: 'gray',
+  },
+  groupContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tabBar: {
     backgroundColor: 'snow',
@@ -208,7 +260,21 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     color: '#000000',
-    // fontWeight: 'bold',
     fontSize: 16,
+  },
+  groupCard: {
+    width: '95%',
+    alignSelf: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 80,
+    padding: 9,
+    backgroundColor: 'white',
+    marginVertical: 12,
+  },
+  groupName: {
+    fontWeight: 'bold',
+    color: 'black',
+    fontSize: 12,
   },
 });

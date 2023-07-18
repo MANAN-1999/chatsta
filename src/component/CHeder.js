@@ -1,6 +1,7 @@
 import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
 
 const CHeder = ({
   title,
@@ -12,22 +13,33 @@ const CHeder = ({
   isIcon,
   profileimg,
   imgstyle,
-  image
+  image,
 }) => {
+  const navigation = useNavigation();
   return (
     <View style={[styles.continer, otherstyle]}>
       {isIcon ? (
-        <TouchableOpacity onPress={onpress}>
+        <TouchableOpacity
+          style={{width: '10%'}}
+          onPress={() => navigation.goBack()}>
           <Ionicons name={ficone} size={isize} color={'gray'} />
         </TouchableOpacity>
       ) : (
-       <TouchableOpacity style={{height:40,width:40,backgroundColor:'red',borderRadius:20,marginBottom:3}}>
-       <Image  source={image} />
-       </TouchableOpacity>
-       
+        <TouchableOpacity
+          style={{
+            height: 40,
+            width: 40,
+            // backgroundColor: 'red',
+            borderRadius: 25,
+            marginBottom: 3,
+            // width: '10%',
+            overflow:'hidden'
+          }}>
+          <Image source={{ uri: image }} style={{width:'100%',height:'100%',}} />
+        </TouchableOpacity>
       )}
       <Text style={styles.txt}>{title}</Text>
-      <TouchableOpacity onPress={onpress}>
+      <TouchableOpacity style={{width: '10%'}} onPress={onpress}>
         <Ionicons name={sicone} size={isize} color={'black'} />
       </TouchableOpacity>
     </View>
@@ -37,7 +49,14 @@ const CHeder = ({
 export default CHeder;
 
 const styles = StyleSheet.create({
-  txt: {fontSize: 25, fontWeight: 'bold', color: 'black'},
+  txt: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: 'black',
+    width: '80%',
+    alignSelf: 'center',
+    textAlign: 'center',
+  },
   continer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
