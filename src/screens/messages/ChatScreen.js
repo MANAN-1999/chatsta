@@ -179,7 +179,7 @@ const ChatScreen = () => {
                 <Text>{message.text}</Text>
               </View>
               <Text style={styles.messageTime}>
-                {message.time ? formatMessageTime(message.time) : ''}
+                {message.time ? formatMessdddcageTime(message.time) : ''}
               </Text>
             </View>
           </View>
@@ -269,11 +269,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
     borderRadius: 20,
     backgroundColor: 'blue',
+    overflow: 'hidden',
   },
   avatar: {
     width: '100%',
     height: '100%',
-    borderRadius:20
+    // borderRadius: 20,
   },
   messageContentContainer: {
     flexDirection: 'column',

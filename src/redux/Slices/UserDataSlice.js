@@ -9,7 +9,7 @@ const userDataSlice = createSlice({
     setUserData(state, action) {
       state.userData = action.payload;
     },
-    removeUserData(state) {
+    removeUserData(state, action) {
       state.userData = [];
     },
   },
