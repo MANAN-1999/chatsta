@@ -511,51 +511,39 @@ const ChatScreen = () => {
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={styles.scrollViewContent}
-        onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}
-      >
-        {messages.map((message, index) => {
-          const displayDate = getDisplayDate(message.time);
-          const showDateHeader = index === 0 || displayDate !== getDisplayDate(messages[index - 1].time);
-
-          return (
-            <React.Fragment key={index} >
-              {showDateHeader && <Text style={[styles.dateText,{textAlign:'center',fontSize:15,fontWeight:'600',color:'black'}]}>{displayDate}</Text>}
+        onContentSizeChange={() =>
+          scrollViewRef.current.scrollToEnd({animated: true})
+        }>
+        {messages.map((message, index) => (
+          <View
+            key={index}
+            style={[
+              styles.messageContainer,
+              message.sender === data?.username
+                ? styles.sentMessageContainer
+                : styles.receivedMessageContainer,
+            ]}>
+            {message.sender !== data?.username && (
+              <View style={styles.avatarContainer}>
+                <Image source={{uri: item?.imageURL}} style={styles.avatar} />
+              </View>
+            )}
+            <View style={styles.messageContentContainer}>
               <View
                 style={[
-                  styles.messageContainer,
-                  message.sender === data?.username ? styles.sentMessageContainer : styles.receivedMessageContainer,
-                ]}
-              >
-                {message.sender !== data?.username && (
-                  <View style={styles.avatarContainer}>
-                    <Image source={{ uri: item?.imageURL }} style={styles.avatar} />
-                  </View>
-                )}
-                <View style={styles.messageContentContainer}>
-                  <View
-                    style={[
-                      styles.messageContent,
-                      message.sender === data?.username ? styles.sentMessageContent : styles.receivedMessageContent,
-                    ]}
-                  >
-                    <Text>{message.text}</Text>
-                  </View>
-                  <Text
-                    style={[
-                      styles.dateText,
-                      {
-                        color: item.senderId === data.id ? 'black' : 'black',
-                        textAlign: item.senderId === data.id ? 'right' : 'left',
-                      },
-                    ]}
-                  >
-                    {moment(message.time.toDate()).format('LT')}
-                  </Text>
-                </View>
+                  styles.messageContent,
+                  message.sender === data?.username
+                    ? styles.sentMessageContent
+                    : styles.receivedMessageContent,
+                ]}>
+                <Text>{message.text}</Text>
               </View>
-            </React.Fragment>
-          );
-        })}
+              <Text style={styles.messageTime}>
+                {message.time ? formatMessageTime(message.time) : ''}
+              </Text>
+            </View>
+          </View>
+        ))}
       </ScrollView>
       <View style={styles.inputContainer}>
         <TouchableOpacity style={styles.iconContainer}>
