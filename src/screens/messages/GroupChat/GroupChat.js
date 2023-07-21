@@ -25,6 +25,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import moment from 'moment';
 
 const {height, width} = Dimensions.get('window');
 
@@ -38,6 +39,8 @@ const GroupChat = () => {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState('');
   const data = useSelector(state => state.userData.userData);
+
+  console.log(data.images[0], 'dta');
 
   const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
 
@@ -61,6 +64,7 @@ const GroupChat = () => {
     }
 
     try {
+      console.log(data?.images[0], 'data?.images[0]');
       const messageData = {
         messageId:
           Date.now().toString() + Math.floor(Math.random() * 10000).toString(),
@@ -68,6 +72,7 @@ const GroupChat = () => {
         senderId: data?.id,
         senderName: data?.username,
         text: messageText,
+        imageURL: data.images[0],
         createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
       };
 
@@ -85,84 +90,70 @@ const GroupChat = () => {
   };
 
   const renderMessages = ({item, index}) => {
+    console.log(item, 'kdajsbdkbce');
     const timestamp = item?.createdAt;
 
     const date = new Date(
       timestamp?.seconds * 1000 + timestamp?.nanoseconds / 1000000,
     );
+    return (
+      <View style={{margin: 5}} key={index}>
+        <View style={{flexDirection: 'row'}}></View>
+        <View
+          style={{
+            alignSelf: item.senderId === data.id ? 'flex-end' : 'flex-start',
+            backgroundColor: item.senderId === data.id ? 'white' : 'white',
+          }}>
+          {item.senderId !== data.id && (
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Image
+                source={{uri: item.imageURL}}
+                style={{
+                  height: 30,
+                  width: 30,
+                  borderRadius: 15,
+                  marginRight: 8,
+                }}
+              />
+              <Text
+                style={[
+                  styles.senderNameText,
+                  {
+                    color: 'gray',
+                    textAlign: 'left',
+                  },
+                ]}>
+                {item.senderName}
+              </Text>
+            </View>
+          )}
 
-    const renderMessage = text => {
-      const parts = text.text.split(emailRegex);
-
-      const highlightedParts = parts.map((part, index) => {
-        if (emailRegex.test(part)) {
-          return (
-            <Text
-              key={index}
-              style={styles.highlightedText}
-              onPress={() => Linking.openURL(`mailto:${part}`)}>
-              {part}
-            </Text>
-          );
-        } else {
-          return (
+          <View style={{minWidth: '20%', maxWidth: '70%', marginLeft: 30}}>
             <Text
               style={{
-                color: text.senderId == data.id ? 'white' : 'black',
-              }}
-              key={index}>
-              {part}
+                color: item.senderId === data.id ? 'snow' : 'black',
+                textAlign: item.senderId === data.id ? 'left' : 'left',
+                backgroundColor: item.senderId === data.id ? '#7d7eff' : 'gray',
+                padding: 10,
+                paddingLeft: item.senderId === data.id ? 20 : 20,
+
+                borderTopLeftRadius: item.senderId === data.id ? 30 : 5,
+                borderBottomLeftRadius: item.senderId === data.id ? 30 : 5,
+                borderTopRightRadius: item.senderId === data.id ? 5 : 30,
+                borderBottomRightRadius: item.senderId === data.id ? 5 : 30,
+              }}>
+              {item.text}
             </Text>
-          );
-        }
-      });
-      return (
-        <View>
-          <Text style={styles.containers}>{highlightedParts}</Text>
-        </View>
-      );
-    };
-
-    return (
-      <View
-        style={{
-          margin: 8,
-        }}
-        key={index}>
-        <View
-          style={[
-            styles.message,
-            {
-              backgroundColor: item.senderId == data.id ? '#002DE3' : 'white',
-              alignSelf: item.senderId == data.id ? 'flex-end' : 'flex-start',
-            },
-          ]}>
-          <Text
-            style={[
-              styles.senderNameText,
-              {
-                color: item.senderId == data.id ? 'white' : 'black',
-                textAlign: item.senderId == data.id ? 'right' : 'left',
-              },
-            ]}>
-            {item.senderName}
-          </Text>
-
-          <Text
-            style={{
-              color: item.senderId == data.id ? 'white' : 'black',
-            }}>
-            {renderMessage(item)}
-          </Text>
-
+          </View>
           <Text
             style={[
               styles.dateText,
               {
-                color: item.senderId == data.id ? 'white' : 'black',
+                color: item.senderId === data.id ? 'black' : 'black',
+                textAlign: item.senderId === data.id ? 'right' : 'left',
               },
             ]}>
-            {/* {moment(date).format('LT')} */}
+            {moment(date).format('LT')}
           </Text>
         </View>
       </View>
@@ -186,27 +177,7 @@ const GroupChat = () => {
         inverted={true}
         showsVerticalScrollIndicator={false}
       />
-
-      {/* <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.bottomBarBtn} onPress={() => onPlus()}>
-          <AntDesign name="plus" size={20} color={'grey'} />
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          placeholder="Write your message......."
-          placeholderTextColor={'black'}
-          value={messageText}
-          onChangeText={txt => setMessageText(txt)}
-          multiline={true}
-        />
-        <TouchableOpacity
-          disable={messageText.length == 0 ? true : false}
-          style={styles.bottomBarBtn}
-          onPress={() => handleSendMessage()}>
-          <Feather name="send" size={20} color={'#002DE3'} />
-        </TouchableOpacity>
-      </View> */}
-       <View style={styles.inputContainer}>
+      <View style={styles.inputContainer}>
         <TouchableOpacity style={styles.iconContainer}>
           <Ionicons name="md-add-circle-sharp" size={30} color="blue" />
         </TouchableOpacity>
@@ -276,23 +247,24 @@ const styles = StyleSheet.create({
   },
   message: {
     elevation: 6,
-    maxWidth: '80%',
-    minWidth: '20%',
+    maxWidth: '70%',
+    minWidth: '30%',
     shadowRadius: 3.84,
     shadowColor: '#000',
     shadowOpacity: 0.25,
-    alignSelf: 'flex-end',
-    padding: 9,
+    // alignSelf: 'flex-end',
+    padding: 5,
     marginVertical: 4,
     shadowOffset: {width: 0, height: 2},
     borderTopEndRadius: 9,
-    marginHorizontal: 12,
+    // marginHorizontal: 8,
     borderBottomLeftRadius: 9,
+    height: 'auto',
   },
   dateText: {
-    textAlign: 'right',
     fontSize: 10,
-    marginTop: 8,
+    margin: 5,
+    marginLeft: 30,
   },
   bottomBar: {
     height: 'auto',
@@ -329,8 +301,8 @@ const styles = StyleSheet.create({
   },
   senderNameText: {
     fontSize: 12,
-    marginLeft: 6,
-    marginBottom: 9,
+    // marginLeft: 12,
+    // marginBottom: 9,
     fontWeight: '700',
     textDecorationLine: 'underline',
   },
@@ -413,8 +385,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderRadius: 12,
   },
-  cHeaderStyle:{
-    paddingVertical:12
+  cHeaderStyle: {
+    paddingVertical: 12,
   },
   inputContainer: {
     flexDirection: 'row',
