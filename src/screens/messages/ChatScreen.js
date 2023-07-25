@@ -165,7 +165,6 @@ const ChatScreen = () => {
         {messages.map((message, index) => {
           const displayDate = getDisplayDate(message.time);
           const showDateHeader = index === 0 || displayDate !== getDisplayDate(messages[index - 1].time);
-
           return (
             <React.Fragment key={index} >
               {showDateHeader && <Text style={[styles.dateText,{textAlign:'center',fontSize:15,fontWeight:'600',color:'black'}]}>{displayDate}</Text>}

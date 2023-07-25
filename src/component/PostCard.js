@@ -1,27 +1,26 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  TextInput,
-  Dimensions,
-  ScrollView,
-} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {emojis} from '../assets/data/dummydata';
+import { emojis } from '../assets/data/dummydata';
 import Video from 'react-native-video';
 
-const {width, height} = Dimensions.get('window');
-const PostCard = ({username, desc, media, profileImgs, Source}) => {
+const { width, height } = Dimensions.get('window');
+
+const PostCard = ({ username, desc, media, profileImgs, Source }) => {
   const videoRefs = useRef([]);
   const [isPlaying, setIsPlaying] = useState([]);
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
   useEffect(() => {
     const initialIsPlaying = media.map(() => false);
     setIsPlaying(initialIsPlaying);
   }, [media]);
+
+  const handleMediaScroll = event => {
+    const contentOffset = event.nativeEvent.contentOffset;
+    const currentIndex = Math.round(contentOffset.x / width);
+    setActiveMediaIndex(currentIndex);
+  };
 
   const togglePlay = index => {
     const videoRef = videoRefs.current[index];
@@ -34,49 +33,34 @@ const PostCard = ({username, desc, media, profileImgs, Source}) => {
       });
     }
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerMainView}>
         <View style={styles.profile}>
           <TouchableOpacity style={styles.profileImg}>
-            <Image
-              source={{uri: Source[0]}}
-              style={{height: '100%', width: '100%'}}
-            />
-            
+            <Image source={{ uri: Source[0] }} style={{ height: '100%', width: '100%' }} />
           </TouchableOpacity>
           <View style={styles.profileName}>
-            <Text style={[styles.descText, {marginTop: 0}]}>{username}</Text>
-            <Text style={[styles.descText, {marginTop: 0}]}>
-              Today at 5:15 pm
-            </Text>
+            <Text style={[styles.descText, { marginTop: 0 }]}>{username}</Text>
+            <Text style={[styles.descText, { marginTop: 0 }]}>Today at 5:15 pm</Text>
           </View>
         </View>
         <TouchableOpacity>
-          <Ionicons
-            name="ios-ellipsis-horizontal-sharp"
-            size={20}
-            color="black"
-          />
+          <Ionicons name="ios-ellipsis-horizontal-sharp" size={20} color="black" />
         </TouchableOpacity>
       </View>
-      <Text style={[styles.descText, {marginLeft: 10}]}>{desc}</Text>
+      <Text style={[styles.descText, { marginLeft: 10 }]}>{desc}</Text>
 
-      <ScrollView
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}>
-        <View style={{flexDirection: 'row'}}>
-          {media.map((item, index) => {
-            return item.type === 'video' ? (
-              <TouchableOpacity
-                key={index}
-                style={styles.vediomediaItem}
-                onPress={() => togglePlay(index)}>
+      <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} onScroll={handleMediaScroll} scrollEventThrottle={16}>
+        <View style={{ flexDirection: 'row',backgroundColor:'#e8ebea' }}>
+          {media.map((item, index) =>
+            item.type === 'video' ? (
+              <TouchableOpacity key={index} style={styles.vediomediaItem} onPress={() => togglePlay(index)}>
                 <View>
                   <Video
                     ref={ref => (videoRefs.current[index] = ref)}
-                    source={{uri: item.url}}
+                    source={{ uri: item.url }}
                     style={styles.video}
                     resizeMode="stretch"
                     controls={false}
@@ -92,12 +76,20 @@ const PostCard = ({username, desc, media, profileImgs, Source}) => {
               </TouchableOpacity>
             ) : item.type === 'image' ? (
               <View key={index} style={styles.mediaItem}>
-                <Image source={{uri: item.url}} style={styles.image}  />
+                <Image source={{ uri: item.url }} style={styles.image} />
               </View>
-            ) : null;
-          })}
+            ) : null
+          )}
         </View>
       </ScrollView>
+
+      {media.length > 1 && (
+        <View style={styles.paginationContainer}>
+          {media.map((_, index) => (
+            <View key={index} style={[styles.paginationDot, index === activeMediaIndex && styles.activeDot]} />
+          ))}
+        </View>
+      )}
 
       <View style={styles.emojiContainer}>
         {emojis.map((item, index) => (
@@ -114,11 +106,7 @@ const PostCard = ({username, desc, media, profileImgs, Source}) => {
 
       <TouchableOpacity activeOpacity={0.7}>
         <View style={styles.commentBtn}>
-          <Ionicons
-            name="md-chatbox-ellipses-outline"
-            size={25}
-            color="black"
-          />
+          <Ionicons name="md-chatbox-ellipses-outline" size={25} color="black" />
           <Text style={styles.commentStyle}>2 Comments</Text>
         </View>
         <View style={styles.commentContainer}>
@@ -274,5 +262,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'gray',
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: 'black',
   },
 });

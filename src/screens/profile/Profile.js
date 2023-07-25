@@ -15,11 +15,15 @@ import PostCard from '../../component/PostCard';
 import firestore from '@react-native-firebase/firestore';
 import { useSelector } from 'react-redux';
 
+
 const { width,height } = Dimensions.get('window');
 
 const Profile = () => {
   const [userData, setUserData] = useState([]);
   const reduxData = useSelector(state => state.userData.userData);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,30 +77,78 @@ const Profile = () => {
     return null;
   };
 
+
+  const handleDotChange = (index) => {
+    setActiveImageIndex(index);
+  };
+
   const renderProfileImages = () => {
     const item = userData.length > 0 ? userData[0] : null;
     if (item) {
       return (
-        <View style={styles.imageContainer}>
-          {item.userData.images.map((image, index) => (
-            <View key={index} style={styles.imageItem}>
-              <Image source={{ uri: image }} style={styles.image} resizeMode='cover'/>
-            </View>
-          ))}
+        <View>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={(event) => {
+              const offsetX = event.nativeEvent.contentOffset.x;
+              const activeIndex = Math.round(offsetX / width);
+              setActiveImageIndex(activeIndex);
+            }}
+          >
+            {item.userData.images.map((image, index) => (
+              <View key={index} style={styles.imageItem}>
+                <Image source={{ uri: image }} style={styles.image} resizeMode='cover' />
+              </View>
+            ))}
+          </ScrollView>
+          <View style={styles.paginationDots}>
+            {item.userData.images.map((_, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.dot,
+                  index === activeImageIndex && styles.activeDot,
+                ]}
+                onPress={() => handleDotChange(index)}
+              />
+            ))}
+          </View>
         </View>
       );
     }
     return null;
   };
 
+  // const renderProfileImages = () => {
+  //   const item = userData.length > 0 ? userData[0] : null;
+  //   if (item) {
+  //     return (
+  //       <View style={styles.imageContainer}>
+  //         {item.userData.images.map((image, index) => (
+            
+  //           <View key={index} style={styles.imageItem}>
+  //             <Image source={{ uri: image }} style={styles.image} resizeMode='cover'/>
+  //           </View>
+  //         ))}
+  //       </View>
+  //     );
+  //   }
+  //   return null;
+  // };
+
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.contentContainer}>
-          <View style={styles.imageRow}>
+          {/* <View style={styles.imageRow}>
             <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator>
               {renderProfileImages()}
             </ScrollView>
+          </View> */}
+          <View style={styles.imageRow}>
+            {renderProfileImages()}
           </View>
 
           <View style={styles.profileCardContainer}>
@@ -188,6 +240,7 @@ const styles = StyleSheet.create({
   imageRow: {
     flexDirection: 'row',
     justifyContent: 'center',
+   
     // marginTop: 30,
   },
   imageContainer: {
@@ -200,7 +253,8 @@ const styles = StyleSheet.create({
   image: {
     height: 400,
     width: width,
-    // borderRadius: 25,
+    borderBottomRightRadius: 25,
+    borderBottomLeftRadius:25
   },
   profileCardContainer: {
     // height:height,
@@ -276,6 +330,21 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  paginationDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    marginHorizontal: 5,
+  },
+  activeDot: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
 });
 

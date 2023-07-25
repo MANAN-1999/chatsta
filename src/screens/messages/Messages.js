@@ -16,6 +16,7 @@ import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
+import Onlinestatus from './Onlinestatus';
 
 const {width, height} = Dimensions.get('window');
 
@@ -168,6 +169,7 @@ const Messages = () => {
         isize={25}
         otherstyle={{borderBottomWidth: 0}}
         onpress={() => navigation.navigate('ContactList')}
+        onimgpress={() => navigation.navigate('Onlinestatus')}
       />
       <View style={styles.searchBar}>
         <Ionicons name="search" size={20} color={'black'} />

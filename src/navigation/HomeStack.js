@@ -25,6 +25,7 @@ import ChatScreen from '../screens/messages/ChatScreen';
 import ContactList from '../screens/messages/ContactList/ContactList';
 import CreateGroup from '../screens/messages/CreateGroup/CreateGroup';
 import GroupChat from '../screens/messages/GroupChat/GroupChat';
+import Onlinestatus from '../screens/messages/Onlinestatus';
 const Stack = createNativeStackNavigator();
 const HomeStack = () => {
   return (
@@ -54,6 +55,7 @@ const HomeStack = () => {
       <Stack.Screen name="ContactList" component={ContactList} />
       <Stack.Screen name="CreateGroup" component={CreateGroup} />
       <Stack.Screen name="GroupChat" component={GroupChat} />
+      <Stack.Screen name='Onlinestatus' component={Onlinestatus} />
     </Stack.Navigator>
   );
 };

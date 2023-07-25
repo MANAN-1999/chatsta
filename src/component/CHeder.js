@@ -14,6 +14,7 @@ const CHeder = ({
   profileimg,
   imgstyle,
   image,
+  onimgpress
 }) => {
   const navigation = useNavigation();
   return (
@@ -34,7 +35,7 @@ const CHeder = ({
             marginBottom: 3,
             // width: '10%',
             overflow:'hidden'
-          }}>
+          }} onPress={onimgpress}>
           <Image source={{ uri: image }} style={{width:'100%',height:'100%',}} />
         </TouchableOpacity>
       )}
