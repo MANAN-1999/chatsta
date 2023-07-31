@@ -10,7 +10,6 @@ import {
   KeyboardAvoidingView,
   Dimensions,
   SafeAreaView,
-  BackHandler
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -24,22 +23,6 @@ const Deshbord = () => {
   const [showSearchInput, setShowSearchInput] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [userData, setUserData] = useState([]);
-
-
-  useEffect(() => {
-    // Add the event listener for the back button press
-    const backAction = () => {
-      BackHandler.exitApp(); // Exit the app when back button is pressed
-      return true; // Return true to prevent default behavior (i.e., going back to the previous screen)
-    };
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-    // Clean up the event listener when the component is unmounted
-    return () => backHandler.remove();
-  }, []);
-
-
 
   useEffect(() => {
     const fetchData = async () => {

@@ -23,8 +23,6 @@ const Profile = () => {
   const reduxData = useSelector(state => state.userData.userData);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-
-
   useEffect(() => {
     const fetchData = async () => {
       const msgRef = firestore().collectionGroup('allposts');
@@ -239,8 +237,7 @@ const styles = StyleSheet.create({
   },
   imageRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
-   
+    justifyContent: 'center', 
     // marginTop: 30,
   },
   imageContainer: {
@@ -282,14 +279,10 @@ const styles = StyleSheet.create({
   connectionText: {
     flexDirection: 'row',
     alignItems: 'center',
-
-
-
   },
   connectionTextTitle: {
     fontSize: 20,
-    color: 'black',
-    
+    color: 'black',   
   },
   connectionRequest: {
     flexDirection: 'row',

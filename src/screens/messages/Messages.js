@@ -165,7 +165,7 @@ const Messages = () => {
       <CHeder
         title={'Messages'}
         sicone={'ios-create-outline'}
-        image={data?.images[0]}
+        image={data && data?.images[0]}
         isize={25}
         otherstyle={{borderBottomWidth: 0}}
         onpress={() => navigation.navigate('ContactList')}

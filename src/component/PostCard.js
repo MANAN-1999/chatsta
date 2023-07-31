@@ -39,7 +39,7 @@ const PostCard = ({ username, desc, media, profileImgs, Source }) => {
       <View style={styles.headerMainView}>
         <View style={styles.profile}>
           <TouchableOpacity style={styles.profileImg}>
-            <Image source={{ uri: Source[0] }} style={{ height: '100%', width: '100%' }} />
+            <Image source={{ uri: Source ? Source[0] : undefined}} style={{ height: '100%', width: '100%' }} />
           </TouchableOpacity>
           <View style={styles.profileName}>
             <Text style={[styles.descText, { marginTop: 0 }]}>{username}</Text>
@@ -53,7 +53,7 @@ const PostCard = ({ username, desc, media, profileImgs, Source }) => {
       <Text style={[styles.descText, { marginLeft: 10 }]}>{desc}</Text>
 
       <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} onScroll={handleMediaScroll} scrollEventThrottle={16}>
-        <View style={{ flexDirection: 'row',backgroundColor:'#e8ebea' }}>
+        <View style={{ flexDirection: 'row',backgroundColor:'white' }}>
           {media.map((item, index) =>
             item.type === 'video' ? (
               <TouchableOpacity key={index} style={styles.vediomediaItem} onPress={() => togglePlay(index)}>
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   paginationContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   paginationDot: {
     width: 8,

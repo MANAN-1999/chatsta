@@ -9,6 +9,7 @@ import {
   View,
   Dimensions,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import CHeder from '../../component/CHeder';
@@ -43,6 +44,7 @@ const Post = () => {
       setIsPlaying([]);
     }
   }, [isFocused]);
+  
 
   const openMediaPicker = () => {
     ImageCropPicker.openPicker({
@@ -125,15 +127,16 @@ const Post = () => {
 
   const handlePost = async () => {
     try {
+      if (postText.trim() === '' && selectedMedia.length === 0) {
+        Alert.alert('No Data Found');
+        return;
+      }
+
       setIsLoding(true);
-      console.log(data, 'data');
       const uploadedMediaUrls = await uploadMediaToStorage(selectedMedia);
       const docPostId = PostuId();
 
-      const postRef = await firestore()
-        .collection('posts')
-        .doc(data?.docId)
-        .collection('allposts');
+      const postRef = await firestore().collection('posts').doc(data?.docId).collection('allposts');
 
       postRef
         .add({
@@ -143,7 +146,6 @@ const Post = () => {
           userData: data,
           createdAt: firestore.FieldValue.serverTimestamp(),
         })
-
         .then(() => {
           navigation.goBack();
           setIsLoding(false);
@@ -153,8 +155,10 @@ const Post = () => {
         });
 
       // Navigate to another screen and pass the post ID as a parameter
-      // navigation.navigate('TabNavigation', { postId: postRef.id });
+      navigation.navigate('TabNavtigation', { postId: postRef.id });
     } catch (error) {
+      Alert.alert('Error', 'An error occurred while posting.');
+      setIsLoding(false);
       console.log(error);
     }
   };
